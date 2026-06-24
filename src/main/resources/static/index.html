@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BFHL Data Processor</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.15);
+            --secondary: #a855f7;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 40%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-x: hidden;
+        }
+
+        header {
+            padding: 2rem 1rem 1rem 1rem;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        main {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            flex-grow: 1;
+        }
+
+        /* Glassmorphism Card styling */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(99, 102, 241, 0.25);
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-main);
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            color: #fff;
+            resize: none;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        /* Sample buttons styling */
+        .samples {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+            align-items: center;
+        }
+
+        .samples-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .sample-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .sample-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            color: white;
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px -10px rgba(99, 102, 241, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .btn-submit:hover {
+            opacity: 0.95;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -10px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        /* Result section styling */
+        .results-container {
+            display: none;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            color: var(--success);
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .profile-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .profile-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .profile-item i {
+            color: var(--primary);
+        }
+
+        .profile-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.1rem;
+        }
+
+        .profile-value {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .grid-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .result-card {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .result-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .result-title i {
+            color: var(--secondary);
+        }
+
+        .chip-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .chip {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-color);
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+        }
+
+        .empty-placeholder {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+            margin-top: 1.25rem;
+        }
+
+        .stat-val {
+            font-size: 1.5rem;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            background: linear-gradient(135deg, #fff, var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-top: 0.25rem;
+        }
+
+        /* Tabs styling for raw JSON toggle */
+        .json-toggle-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            align-self: flex-start;
+            transition: color 0.2s ease;
+        }
+
+        .json-toggle-btn:hover {
+            color: #fff;
+        }
+
+        .raw-json-panel {
+            display: none;
+            background: #05070c;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #34d399;
+            overflow-x: auto;
+            max-height: 250px;
+            margin-top: 0.75rem;
+        }
+
+        /* Spinner animation */
+        .spinner {
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        footer {
+            padding: 2rem 1rem;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #ef4444;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+            .profile-section {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <i class="fa-solid fa-cube"></i> BFHL Processor
+        </div>
+        <div class="subtitle">Enter array data to categorize and process dynamically</div>
+    </header>
+
+    <main>
+        <section class="card">
+            <div class="input-group">
+                <label for="json-input"><i class="fa-solid fa-code-fork"></i> JSON Input Data</label>
+                <div class="input-wrapper">
+                    <textarea id="json-input" placeholder='{"data": ["a", "1", "334", "4", "R", "$"]}'></textarea>
+                </div>
+                <div class="samples">
+                    <span class="samples-label">Load Samples:</span>
+                    <button class="sample-btn" onclick="loadSample('A')">Example A</button>
+                    <button class="sample-btn" onclick="loadSample('B')">Example B</button>
+                    <button class="sample-btn" onclick="loadSample('C')">Example C</button>
+                </div>
+            </div>
+
+            <button class="btn-submit" onclick="submitData()">
+                <i class="fa-solid fa-arrow-rotate-right spinner" id="btn-spinner"></i>
+                <span id="btn-text">Process Payload</span>
+            </button>
+        </section>
+
+        <section class="card results-container" id="results-panel">
+            <div class="results-header">
+                <h2><i class="fa-solid fa-square-poll-vertical" style="color: var(--primary);"></i> Execution Results</h2>
+                <div class="status-badge">
+                    <i class="fa-solid fa-circle-check"></i> HTTP 200 OK
+                </div>
+            </div>
+
+            <!-- Profile Header -->
+            <div class="profile-section">
+                <div class="profile-item">
+                    <i class="fa-solid fa-user-circle"></i>
+                    <div>
+                        <div class="profile-label">Student Name</div>
+                        <div class="profile-value" id="res-user-id">-</div>
+                    </div>
+                </div>
+                <div class="profile-item">
+                    <i class="fa-solid fa-envelope"></i>
+                    <div>
+                        <div class="profile-label">Email ID</div>
+                        <div class="profile-value" id="res-email">-</div>
+                    </div>
+                </div>
+                <div class="profile-item">
+                    <i class="fa-solid fa-id-card"></i>
+                    <div>
+                        <div class="profile-label">Roll Number</div>
+                        <div class="profile-value" id="res-roll-number">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categorized Cards Grid -->
+            <div class="grid-results">
+                <div class="result-card">
+                    <div class="result-title"><i class="fa-solid fa-arrow-down-1-9"></i> Odd Numbers</div>
+                    <div class="chip-container" id="res-odd-numbers"></div>
+                </div>
+                <div class="result-card">
+                    <div class="result-title"><i class="fa-solid fa-arrow-down-9-1"></i> Even Numbers</div>
+                    <div class="chip-container" id="res-even-numbers"></div>
+                </div>
+                <div class="result-card">
+                    <div class="result-title"><i class="fa-solid fa-font"></i> Alphabets (Uppercase)</div>
+                    <div class="chip-container" id="res-alphabets"></div>
+                </div>
+                <div class="result-card">
+                    <div class="result-title"><i class="fa-solid fa-hashtag"></i> Special Characters</div>
+                    <div class="chip-container" id="res-special-characters"></div>
+                </div>
+            </div>
+
+            <!-- Math stats and string stats -->
+            <div class="stats-row">
+                <div class="result-card">
+                    <div class="result-title"><i class="fa-solid fa-calculator"></i> Sum of Numbers</div>
+                    <div class="stat-val" id="res-sum">0</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-title"><i class="fa-solid fa-arrow-right-arrow-left"></i> Reversed Alternating Caps</div>
+                    <div class="stat-val" id="res-concat-string" style="font-size: 1.35rem;">-</div>
+                </div>
+            </div>
+
+            <!-- Developer Panel Toggle -->
+            <button class="json-toggle-btn" onclick="toggleRawJson()">
+                <i class="fa-solid fa-square-plus" id="toggle-icon"></i> View Raw JSON Output
+            </button>
+            <pre class="raw-json-panel" id="raw-json-code"></pre>
+        </section>
+    </main>
+
+    <footer>
+        <div>Powered by Spring Boot 4.1.0 • Designed for Chitkara Qualifier</div>
+    </footer>
+
+    <!-- Toast message -->
+    <div class="toast" id="error-toast">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span id="toast-message">Invalid JSON input. Please format it correctly.</span>
+    </div>
+
+    <script>
+        const samples = {
+            'A': { "data": ["a", "1", "334", "4", "R", "$"] },
+            'B': { "data": ["2", "a", "y", "4", "&", "-", "*", "5", "92", "b"] },
+            'C': { "data": ["A", "ABCD", "DOE"] }
+        };
+
+        // Populate default on startup
+        document.getElementById('json-input').value = JSON.stringify(samples['A'], null, 2);
+
+        function loadSample(key) {
+            document.getElementById('json-input').value = JSON.stringify(samples[key], null, 2);
+        }
+
+        function toggleRawJson() {
+            const panel = document.getElementById('raw-json-code');
+            const icon = document.getElementById('toggle-icon');
+            if (panel.style.display === 'block') {
+                panel.style.display = 'none';
+                icon.className = 'fa-solid fa-square-plus';
+            } else {
+                panel.style.display = 'block';
+                icon.className = 'fa-solid fa-square-minus';
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('error-toast');
+            document.getElementById('toast-message').textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function submitData() {
+            const inputVal = document.getElementById('json-input').value.trim();
+            if (!inputVal) {
+                showToast("Please enter a JSON payload!");
+                return;
+            }
+
+            let payload;
+            try {
+                payload = JSON.parse(inputVal);
+            } catch (e) {
+                showToast("Invalid JSON syntax! Verify quotation marks and commas.");
+                return;
+            }
+
+            if (!payload.data || !Array.isArray(payload.data)) {
+                showToast('JSON root must contain a "data" list: {"data": [...]}');
+                return;
+            }
+
+            // Spinner toggle
+            const spinner = document.getElementById('btn-spinner');
+            const btnText = document.getElementById('btn-text');
+            spinner.style.display = 'inline-block';
+            btnText.textContent = 'Processing...';
+
+            // Hit the relative API route (works both locally and on Render)
+            fetch('/bfhl', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`Server returned HTTP ${res.status}`);
+                }
+                return res.json();
+            })
+            .then(data => {
+                // Stop Spinner
+                spinner.style.display = 'none';
+                btnText.textContent = 'Process Payload';
+
+                if (!data.is_success) {
+                    showToast("API returned failure status.");
+                    return;
+                }
+
+                // Render fields
+                document.getElementById('results-panel').style.display = 'flex';
+                document.getElementById('res-user-id').textContent = data.user_id;
+                document.getElementById('res-email').textContent = data.email;
+                document.getElementById('res-roll-number').textContent = data.roll_number;
+                document.getElementById('res-sum').textContent = data.sum;
+                document.getElementById('res-concat-string').textContent = data.concat_string || 'N/A';
+
+                // Render Arrays as Chips
+                renderChips('res-odd-numbers', data.odd_numbers);
+                renderChips('res-even-numbers', data.even_numbers);
+                renderChips('res-alphabets', data.alphabets);
+                renderChips('res-special-characters', data.special_characters);
+
+                // Set raw JSON text
+                document.getElementById('raw-json-code').textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                spinner.style.display = 'none';
+                btnText.textContent = 'Process Payload';
+                showToast(`Request failed: ${error.message}`);
+                console.error(error);
+            });
+        }
+
+        function renderChips(containerId, list) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            if (!list || list.length === 0) {
+                container.innerHTML = '<span class="empty-placeholder">Empty list</span>';
+                return;
+            }
+            list.forEach(val => {
+                const chip = document.createElement('span');
+                chip.className = 'chip';
+                chip.textContent = val;
+                container.appendChild(chip);
+            });
+        }
+    </script>
+</body>
+</html>
