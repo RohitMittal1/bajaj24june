@@ -54,4 +54,50 @@ public class BfhlControllerTest {
         assertEquals("339", response.getSum());
         assertEquals("Ra", response.getConcat_string());
     }
+
+    @Test
+    public void testPostEndpointExampleB() {
+        BfhlRequest request = new BfhlRequest(Arrays.asList("2", "a", "y", "4", "&", "-", "*", "5", "92", "b"));
+        ResponseEntity<BfhlResponse> responseEntity = bfhlController.handlePost(request);
+        
+        assertNotNull(responseEntity);
+        assertEquals(200, responseEntity.getStatusCode().value());
+        
+        BfhlResponse response = responseEntity.getBody();
+        assertNotNull(response);
+        assertTrue(response.getIs_success());
+        assertEquals("5", response.getOdd_numbers().get(0));
+        assertEquals("2", response.getEven_numbers().get(0));
+        assertEquals("4", response.getEven_numbers().get(1));
+        assertEquals("92", response.getEven_numbers().get(2));
+        assertEquals("A", response.getAlphabets().get(0));
+        assertEquals("Y", response.getAlphabets().get(1));
+        assertEquals("B", response.getAlphabets().get(2));
+        assertEquals("&", response.getSpecial_characters().get(0));
+        assertEquals("-", response.getSpecial_characters().get(1));
+        assertEquals("*", response.getSpecial_characters().get(2));
+        assertEquals("103", response.getSum());
+        assertEquals("ByA", response.getConcat_string());
+    }
+
+    @Test
+    public void testPostEndpointExampleC() {
+        BfhlRequest request = new BfhlRequest(Arrays.asList("A", "ABCD", "DOE"));
+        ResponseEntity<BfhlResponse> responseEntity = bfhlController.handlePost(request);
+        
+        assertNotNull(responseEntity);
+        assertEquals(200, responseEntity.getStatusCode().value());
+        
+        BfhlResponse response = responseEntity.getBody();
+        assertNotNull(response);
+        assertTrue(response.getIs_success());
+        assertTrue(response.getOdd_numbers().isEmpty());
+        assertTrue(response.getEven_numbers().isEmpty());
+        assertEquals("A", response.getAlphabets().get(0));
+        assertEquals("ABCD", response.getAlphabets().get(1));
+        assertEquals("DOE", response.getAlphabets().get(2));
+        assertTrue(response.getSpecial_characters().isEmpty());
+        assertEquals("0", response.getSum());
+        assertEquals("EoDdCbAa", response.getConcat_string());
+    }
 }
