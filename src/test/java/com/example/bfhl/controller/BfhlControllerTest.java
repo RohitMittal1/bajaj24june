@@ -27,6 +27,14 @@ public class BfhlControllerTest {
     }
 
     @Test
+    public void testRootEndpoint() {
+        org.springframework.http.ResponseEntity<org.springframework.core.io.Resource> response = bfhlController.handleRoot();
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCode().value());
+        assertNotNull(response.getBody());
+    }
+
+    @Test
     public void testHealthEndpoint() {
         ResponseEntity<Map<String, Object>> response = bfhlController.handleHealth();
         assertNotNull(response);

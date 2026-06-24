@@ -4,6 +4,9 @@ import com.example.bfhl.dto.BfhlRequest;
 import com.example.bfhl.dto.BfhlResponse;
 import com.example.bfhl.service.BfhlService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
@@ -18,6 +21,11 @@ public class BfhlController {
     @Autowired
     public BfhlController(BfhlService bfhlService) {
         this.bfhlService = bfhlService;
+    }
+
+    @GetMapping(value = "/", produces = MediaType.TEXT_HTML_VALUE)
+    public ResponseEntity<Resource> handleRoot() {
+        return ResponseEntity.ok(new ClassPathResource("static/index.html"));
     }
 
     @PostMapping("/bfhl")
